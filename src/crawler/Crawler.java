@@ -5,28 +5,61 @@
  */
 package crawler;
 
+import java.sql.DriverManager;
+import java.sql.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
  * @author Satwik Gupta
  */
 public class Crawler {
-
-    /**
-     * @param args the command line arguments
-     */
+    
+    public static Connection con;
+    public static ResultSet rs;
+    
     public static void main(String[] args) {
-        // TODO code application logic here
-        try{
-            Document doc = Jsoup.connect("https://www.google.com").get();  
-            String title = doc.title();  
-            System.out.println("title is: " + title);
+        try {
+            // TODO code application logic here
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_projects", "root", null);
+        } catch (Exception ex) {
+            System.out.println("Some problem occured: "+ex);
         }
-        catch(Exception ex){
-            System.out.println("problem: "+ex);
+        try{
+            crawlPage("http://www.dituniversity.edu.in/");
+        } catch (Exception ex){
+            System.out.println("Some problem occured: "+ex);
         }
     }
     
+    public static void crawlPage(String URL){
+        System.out.println(URL);
+        try{
+            PreparedStatement ps = con.prepareStatement("select * from crawler where url=?");
+            ps.setString(1, URL);
+            rs = ps.executeQuery();
+            if(rs.next()){
+                //do nothing
+            }
+            else{
+                PreparedStatement stmt = con.prepareStatement("insert into crawler(url) values(?)");
+                stmt.setString(1, URL);
+                stmt.executeUpdate();
+                
+                Document doc = Jsoup.connect(URL).get();
+                
+                Elements links = doc.select("a[href]");
+                    for(Element link: links){
+                        if(link.attr("href").contains("mit.edu"))
+                            crawlPage(link.attr("abs:href"));
+                    }
+            }
+        } catch (Exception ex){
+            System.out.println("Problem occured: "+ex);
+        }
+    }
 }
