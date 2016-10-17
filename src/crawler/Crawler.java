@@ -53,8 +53,9 @@ public class Crawler {
                 Document doc = Jsoup.connect(URL).get();
                 
                 Elements links = doc.select("a[href]");
+//                System.out.println(links);
                     for(Element link: links){
-                        if(link.attr("href").contains("mit.edu"))
+                        if(link.attr("href").contains("dituniversity.edu.in"))
                             crawlPage(link.attr("abs:href"));
                     }
             }
