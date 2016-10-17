@@ -5,6 +5,9 @@
  */
 package crawler;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 /**
  *
  * @author Satwik Gupta
@@ -16,6 +19,14 @@ public class Crawler {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        try{
+            Document doc = Jsoup.connect("https://www.google.com").get();  
+            String title = doc.title();  
+            System.out.println("title is: " + title);
+        }
+        catch(Exception ex){
+            System.out.println("problem: "+ex);
+        }
     }
     
 }
